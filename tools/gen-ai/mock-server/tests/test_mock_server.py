@@ -813,6 +813,7 @@ def test_cohere_rerank_ranks_within_the_requested_candidates(client):
 
     assert len(rerank()) == 3
     assert len(rerank(top_n=10)) == 3
+    assert rerank(top_n=0) == []
 
 
 def test_chat_reports_the_service_tier_that_served_the_request(client):

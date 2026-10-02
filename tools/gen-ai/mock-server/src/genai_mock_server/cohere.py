@@ -198,7 +198,9 @@ def cohere_embed_v1():
 def cohere_rerank():
     body = request.get_json(silent=True) or {}
     documents = body.get("documents") or []
-    top_n = body.get("top_n") or len(documents)
+    top_n = body.get("top_n")
+    if top_n is None:
+        top_n = len(documents)
     return {
         "id": "cohere-rerank-mock-001",
         "results": [
