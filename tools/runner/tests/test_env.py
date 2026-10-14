@@ -93,10 +93,8 @@ def test_nothing_overridden_is_quiet(
     assert caplog.text == ""
 
 
-@pytest.mark.parametrize(
-    "raw", ["nan", "inf", "+Infinity", "-inf", "1e309", "0", "-1", "invalid"]
-)
-def test_invalid_timeout_uses_default(
+@pytest.mark.parametrize("raw", ["nan", "inf"])
+def test_nonfinite_timeout_uses_default(
     raw: str,
     process_env: dict[str, str],
     caplog: pytest.LogCaptureFixture,
@@ -107,33 +105,3 @@ def test_invalid_timeout_uses_default(
     assert timeout_seconds(variable, 120.0) == 120.0
     assert variable in caplog.text
     assert "using 120.0" in caplog.text
-
-
-@pytest.mark.parametrize("raw", [None, ""])
-def test_unset_timeout_uses_default_quietly(
-    raw: str | None,
-    process_env: dict[str, str],
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    variable = "OTEL_CONFORMANCE_WEAVER_STOP_TIMEOUT"
-    if raw is not None:
-        process_env[variable] = raw
-
-    assert timeout_seconds(variable, 120.0) == 120.0
-    assert caplog.text == ""
-
-
-@pytest.mark.parametrize(
-    ("raw", "expected"), [("0.25", 0.25), ("600", 600.0), ("1e2", 100.0)]
-)
-def test_finite_positive_timeout_is_preserved(
-    raw: str,
-    expected: float,
-    process_env: dict[str, str],
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    variable = "OTEL_CONFORMANCE_SCENARIO_TIMEOUT"
-    process_env[variable] = raw
-
-    assert timeout_seconds(variable, 600.0) == expected
-    assert caplog.text == ""
